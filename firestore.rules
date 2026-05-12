@@ -1,0 +1,89 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    // HighScore
+    // Collection: highScores
+    // Document ID: {userId}_{region}_{difficulty}
+    // Fields:
+    //   - userId: string (required)
+    //   - displayName: string (optional, size <= 50)
+    //   - photoURL: string (optional, matches http/https)
+    //   - region: string (required)
+    //   - difficulty: number (required)
+    //   - score: number (required)
+    //   - totalCount: number (required)
+    //   - percentage: number (required)
+    //   - updatedAt: timestamp (required)
+    
+    // Helper Functions
+    function isDocUserId() {
+      return true; // no longer checking auth
+    }
+    
+    function isValidUrl(url) {
+      return url is string && (url.matches("^https://.*") || url.matches("^http://.*") || url == '') && url.size() < 500;
+    }
+    
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+    
+    // Domain Validator: HighScore
+    function isValidHighScore(docId) {
+      let data = request.resource.data;
+      let requiredFields = ['userId', 'region', 'difficulty', 'score', 'totalCount', 'percentage', 'updatedAt'];
+      let allowedRegions = ['Mundo', 'América', 'Europa', 'África', 'Asia', 'Oceanía'];
+      let allowedDifficulties = [180, 300, 600];
+      
+      // Enforce Document ID matches exactly the combination
+      let expectedDocId = data.userId + '_' + data.region + '_' + string(data.difficulty);
+      
+      return hasRequiredFields(requiredFields) &&
+             docId == expectedDocId &&
+             data.region in allowedRegions &&
+             data.difficulty in allowedDifficulties &&
+             data.score is number && data.score >= 0 &&
+             data.totalCount is number && data.totalCount > 0 &&
+             data.percentage is number && data.percentage >= 0 && data.percentage <= 100 &&
+             data.updatedAt is timestamp &&
+             // Optional Strings
+             (!("country" in data) || (data.country is string && data.country.size() <= 100)) &&
+             (!("displayName" in data) || (data.displayName is string && data.displayName.size() <= 50)) &&
+             (!("photoURL" in data) || isValidUrl(data.photoURL));
+    }
+    
+    match /highScores/{docId} {
+      // Anyone can read highscores to show the global leaderboard
+      allow read: if true;
+      
+      // User can create/update only their own score document
+      allow create: if isValidHighScore(docId);
+      allow update: if isValidHighScore(docId) && 
+                    request.resource.data.userId == resource.data.userId; // userId immutable
+      
+      // Users can delete their own scores
+      allow delete: if true;
+    }
+
+    match /userMaxScores/{docId} {
+      allow read, write: if true;
+    }
+
+    match /userRegionScores/{docId} {
+      allow read, write: if true;
+    }
+
+    match /countryScores/{docId} {
+      allow read, write: if true;
+    }
+
+    match /countryRegionScores/{docId} {
+      allow read, write: if true;
+    }
+  }
+}

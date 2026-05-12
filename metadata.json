@@ -1,0 +1,6 @@
+{
+  "name": "GeoCrono",
+  "description": "Un minijuego donde el usuario debe escribir todos los países de una región dentro de un límite de tiempo.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": []
+}

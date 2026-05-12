@@ -1,0 +1,56 @@
+{
+  "entities": {
+    "HighScore": {
+      "title": "HighScore",
+      "description": "Represents a user's best score for a specific region and difficulty.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "The UID of the user who achieved the score."
+        },
+        "displayName": {
+          "type": "string",
+          "description": "The user's display name."
+        },
+        "photoURL": {
+          "type": "string",
+          "description": "The user's profile photo URL."
+        },
+        "region": {
+          "type": "string",
+          "description": "The region played (e.g., 'Mundo', 'América')."
+        },
+        "difficulty": {
+          "type": "number",
+          "description": "The difficulty in seconds (180, 300, 600)."
+        },
+        "score": {
+          "type": "number",
+          "description": "The number of countries found."
+        },
+        "totalCount": {
+          "type": "number",
+          "description": "The total number of countries in the region."
+        },
+        "percentage": {
+          "type": "number",
+          "description": "The percentage of countries found."
+        },
+        "updatedAt": {
+          "type": "timestamp",
+          "description": "When the score was achieved."
+        }
+      },
+      "required": ["userId", "region", "difficulty", "score", "totalCount", "percentage", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "highScores": {
+      "schema": {
+        "$ref": "#/entities/HighScore"
+      },
+      "description": "Collection of high scores. Document ID should be `${userId}_${region}_${difficulty}` to ensure one score per user per region and difficulty."
+    }
+  }
+}
