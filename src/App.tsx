@@ -27,7 +27,10 @@ const TIME_OPTIONS = [
 ] as const;
 
 export default function App() {
-  const [lang, setLang] = useState<Language>('es');
+  const [lang, setLang] = useState<Language>(() => {
+    const saved = localStorage.getItem('geocrono_lang');
+    return (saved as Language) || 'en';
+  });
   
   const [user, setUser] = useState<{ uid: string; displayName: string; photoURL: string; country?: string } | null>(null);
   const [isAuthReady, setIsAuthReady] = useState(true);
@@ -73,6 +76,10 @@ export default function App() {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const totalCountries = countries.filter(c => region === 'Mundo' || c.regions.includes(region)).length;
+
+  useEffect(() => {
+    localStorage.setItem('geocrono_lang', lang);
+  }, [lang]);
 
   useEffect(() => {
     const savedUser = localStorage.getItem('geochrono_user');
@@ -558,7 +565,7 @@ export default function App() {
         <div className="flex w-full md:w-auto justify-between items-center shrink-0 gap-4">
           <button 
             onClick={resetToConfig}
-            className="text-[20px] font-extrabold tracking-tight uppercase text-blue-600 hover:opacity-80 transition-opacity cursor-pointer focus:outline-none"
+            className="text-2xl font-display font-extrabold tracking-tight uppercase text-indigo-600 hover:opacity-80 transition-opacity cursor-pointer focus:outline-none"
           >
             {t.title}
           </button>
@@ -681,20 +688,20 @@ export default function App() {
             <div className="flex flex-col md:gap-[30px]">
               <div className="flex flex-row md:flex-col justify-between md:justify-start items-center md:items-start gap-4 md:gap-0">
                 <div className="flex flex-col gap-1 md:gap-1.5 md:mb-[30px]">
-                  <span className="text-[10px] md:text-[12px] uppercase tracking-[1px] text-slate-500 font-bold">{t.time}</span>
-                  <span className="text-2xl md:text-[42px] font-extrabold leading-none text-red-500 tabular-nums">
+                  <span className="text-[10px] md:text-[12px] uppercase tracking-[2px] text-slate-500 font-bold font-display">{t.time}</span>
+                  <span className="text-3xl md:text-[48px] font-display font-extrabold leading-none text-red-500 tabular-nums font-mono tracking-tighter">
                     {formatTime(timeLeft)}
                   </span>
                 </div>
                 <div className="flex flex-col gap-1 md:gap-1.5 md:mb-[30px]">
-                  <span className="text-[10px] md:text-[12px] uppercase tracking-[1px] text-slate-500 font-bold">{t.hits}</span>
-                  <span className="text-2xl md:text-[42px] font-extrabold leading-none">
-                    {foundCountries.length} / {totalCountries}
+                  <span className="text-[10px] md:text-[12px] uppercase tracking-[2px] text-slate-500 font-bold font-display">{t.hits}</span>
+                  <span className="text-3xl md:text-[48px] font-display font-extrabold leading-none text-slate-800 tracking-tight">
+                    {foundCountries.length} <span className="text-slate-400 font-medium text-2xl md:text-3xl">/ {totalCountries}</span>
                   </span>
                 </div>
                 <div className="flex flex-col gap-1 md:gap-1.5">
-                  <span className="text-[10px] md:text-[12px] uppercase tracking-[1px] text-slate-500 font-bold">{t.accuracy}</span>
-                  <span className="text-2xl md:text-[42px] font-extrabold leading-none text-blue-600">
+                  <span className="text-[10px] md:text-[12px] uppercase tracking-[2px] text-slate-500 font-bold font-display">{t.accuracy}</span>
+                  <span className="text-3xl md:text-[48px] font-display font-extrabold leading-none text-indigo-600 tracking-tight">
                     {Math.round((foundCountries.length / totalCountries) * 100) || 0}%
                   </span>
                 </div>
@@ -716,38 +723,38 @@ export default function App() {
           ) : (
             <div className="flex flex-col gap-6 md:min-h-full py-4 md:py-0 md:justify-center">
               <div className="text-center hidden md:block shrink-0">
-                <Globe className="w-12 h-12 text-blue-600 mx-auto mb-4" />
-                <h2 className="text-xl font-bold text-slate-800 mb-2">{t.config}</h2>
+                <Globe className="w-12 h-12 text-indigo-600 mx-auto mb-4" />
+                <h2 className="text-2xl font-display font-extrabold text-slate-800 mb-2">{t.config}</h2>
                 <p className="text-sm text-slate-500">{t.configDesc}</p>
               </div>
 
               {highScores[`${region}-${selectedTime}`] && (
-                <div className="relative p-4 md:p-5 bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl border border-emerald-200/60 shadow-sm overflow-hidden group hover:shadow-md transition-shadow shrink-0 w-full">
-                  <div className="absolute -right-4 -top-4 w-20 h-20 bg-emerald-100 rounded-full blur-2xl opacity-60 group-hover:opacity-80 transition-opacity"></div>
+                <div className="relative p-5 bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden group hover:shadow-md transition-shadow shrink-0 w-full">
+                  <div className="absolute right-0 top-0 w-24 h-24 bg-indigo-50 rounded-bl-[100px] -z-0 opacity-50"></div>
                   <div className="relative z-10 flex flex-col items-center w-full">
                     <div className="flex justify-center items-center gap-1.5 mb-2 w-full">
                       <span className="text-xl shrink-0">🏆</span>
-                      <p className="text-[10px] md:text-[11px] uppercase tracking-wide text-emerald-800/80 font-bold text-center leading-tight">
+                      <p className="text-[11px] uppercase tracking-widest text-slate-500 font-bold text-center leading-tight">
                         {t.bestScore}
                       </p>
                       <span className="text-xl shrink-0">🏆</span>
                     </div>
                     
-                    <p className="text-3xl md:text-4xl font-black text-emerald-900 tracking-tight flex items-baseline gap-1 mt-1">
+                    <p className="text-4xl font-display font-black text-slate-800 tracking-tighter flex items-baseline gap-1 mt-1">
                       {highScores[`${region}-${selectedTime}`].score}
-                      <span className="text-xs md:text-sm font-bold text-emerald-700 uppercase tracking-widest translate-y-[-1px] md:translate-y-[-2px] ml-1">
+                      <span className="text-sm font-bold text-slate-400 uppercase tracking-widest translate-y-[-2px] ml-1">
                         / {totalCountries}
                       </span>
                     </p>
                     
-                    <div className="mt-3 flex items-center justify-center w-full">
-                      <div className="h-1.5 w-full bg-emerald-200/50 rounded-full overflow-hidden">
+                    <div className="mt-4 flex items-center justify-center w-full gap-3">
+                      <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
                         <div 
-                          className="h-full bg-emerald-500 rounded-full" 
+                          className="h-full bg-indigo-500 rounded-full transition-all duration-1000 ease-out" 
                           style={{ width: `${highScores[`${region}-${selectedTime}`].percentage}%` }}
                         ></div>
                       </div>
-                      <span className="text-[10px] md:text-[11px] font-bold text-emerald-700 ml-2 min-w-[36px] text-right">
+                      <span className="text-[11px] font-bold text-slate-500 min-w-[36px] text-right">
                         {highScores[`${region}-${selectedTime}`].percentage}%
                       </span>
                     </div>
@@ -779,19 +786,19 @@ export default function App() {
                 </div>
               </div>
 
-              <div className="flex flex-col gap-2 mt-2 shrink-0">
+              <div className="flex flex-col gap-3 mt-4 shrink-0">
                 <button
                   onClick={startGame}
-                  className="w-full flex items-center justify-center gap-2 bg-slate-800 text-white px-6 py-4 rounded font-bold hover:bg-slate-700 transition-colors uppercase tracking-wider text-sm"
+                  className="w-full flex items-center justify-center gap-2 bg-indigo-600 text-white px-6 py-4 rounded-xl font-bold hover:bg-indigo-700 transition-colors uppercase tracking-wider text-sm shadow-sm"
                 >
-                  <Play className="w-4 h-4" />
+                  <Play className="w-4 h-4 mr-1" />
                   {t.startGame}
                 </button>
                 <button
                   onClick={loadLeaderboard}
-                  className="w-full flex items-center justify-center gap-2 bg-amber-50 text-amber-700 border border-amber-200 px-6 py-3 rounded font-bold hover:bg-amber-100 transition-colors uppercase tracking-wider text-xs"
+                  className="w-full flex items-center justify-center gap-2 bg-slate-100 text-slate-700 border border-slate-200 px-6 py-3 rounded-xl font-bold hover:bg-slate-200 transition-colors uppercase tracking-wider text-xs"
                 >
-                  <Trophy className="w-4 h-4" />
+                  <Trophy className="w-4 h-4 text-amber-500 mr-1" />
                   {t.globalRanking}
                 </button>
               </div>
@@ -812,7 +819,7 @@ export default function App() {
                     onKeyDown={handleKeyDown}
                     disabled={isValidating}
                     placeholder={t.countryPlc}
-                    className="w-full p-4 pr-14 text-xl md:p-[20px_24px] md:pr-[60px] md:text-[24px] border-2 border-slate-800 rounded-[8px] outline-none shadow-[4px_4px_0px_rgba(0,0,0,0.05)] md:shadow-[6px_6px_0px_rgba(0,0,0,0.05)] focus:shadow-[6px_6px_0px_rgba(0,0,0,0.1)] md:focus:shadow-[8px_8px_0px_rgba(0,0,0,0.1)] transition-shadow disabled:opacity-50 disabled:bg-slate-50"
+                    className="w-full p-4 pr-16 text-xl md:p-[24px] md:pr-[70px] md:text-[28px] font-display font-semibold border-2 border-slate-800 rounded-xl outline-none shadow-[4px_4px_0px_rgba(15,23,42,1)] focus:shadow-[6px_6px_0px_rgba(15,23,42,1)] focus:-translate-y-0.5 transition-all disabled:opacity-50 disabled:bg-slate-50"
                     autoComplete="off"
                     autoFocus
                   />
@@ -885,15 +892,15 @@ export default function App() {
                       <div 
                         key={country.name}
                         className={cn(
-                          "rounded-[4px] p-[10px_12px] text-[13px] font-medium flex items-center justify-between border",
+                          "rounded-[6px] p-3 text-[13px] font-semibold flex items-center justify-between border-2 transition-all",
                           isFound 
-                            ? "bg-emerald-500 text-white border-emerald-500" 
-                            : "bg-white border-dashed border-slate-200 text-slate-300"
+                            ? "bg-emerald-50 text-emerald-700 border-emerald-500 shadow-[2px_2px_0px_rgba(16,185,129,1)] -translate-y-px" 
+                            : "bg-white border-dashed border-slate-200 text-slate-400"
                         )}
                       >
                         {isFound ? (lang === 'en' ? country.nameEn : country.name) : `${t.country} ${index + 1}`}
                         {isFound && (
-                          <span className="w-[14px] h-[14px] bg-white rounded-full flex items-center justify-center text-emerald-500 text-[10px]">
+                          <span className="w-5 h-5 bg-emerald-500 rounded-full flex items-center justify-center text-white text-[11px] shrink-0">
                             ✓
                           </span>
                         )}
@@ -949,19 +956,19 @@ export default function App() {
                       <div 
                         key={country.name}
                         className={cn(
-                          "rounded-[4px] p-[10px_12px] text-[13px] font-medium flex items-center justify-between border",
+                          "rounded-[6px] p-3 text-[13px] font-semibold flex items-center justify-between border-2 transition-all",
                           isFound 
-                            ? "bg-emerald-500 text-white border-emerald-500" 
-                            : "bg-red-50 text-red-500 border-red-200"
+                            ? "bg-emerald-50 text-emerald-700 border-emerald-500 shadow-[2px_2px_0px_rgba(16,185,129,1)] -translate-y-px" 
+                            : "bg-red-50 text-red-600 border-red-300"
                         )}
                       >
                         {lang === 'en' ? country.nameEn : country.name}
                         {isFound ? (
-                          <span className="w-[14px] h-[14px] bg-white rounded-full flex items-center justify-center text-emerald-500 text-[10px]">
+                          <span className="w-5 h-5 bg-emerald-500 rounded-full flex items-center justify-center text-white text-[11px] shrink-0">
                             ✓
                           </span>
                         ) : (
-                          <span className="w-[14px] h-[14px] bg-red-100 rounded-full flex items-center justify-center text-red-500 text-[10px]">
+                          <span className="w-5 h-5 bg-red-100 rounded-full flex items-center justify-center text-red-500 text-[11px] shrink-0">
                             ✕
                           </span>
                         )}
@@ -975,13 +982,13 @@ export default function App() {
           {!isPlaying && !isFinished && (
             <div className="flex-1 flex flex-col justify-center items-center py-6 md:py-0">
               <div className="max-w-lg text-center mb-auto mt-12 md:mt-24">
-                <div className="inline-flex items-center justify-center w-20 h-20 bg-blue-50 text-blue-600 rounded-full mb-6">
-                  <Globe className="w-10 h-10" />
+                <div className="inline-flex items-center justify-center w-24 h-24 bg-indigo-50 text-indigo-600 rounded-3xl rotate-3 mb-8 shadow-sm">
+                  <Globe className="w-12 h-12 -rotate-3" />
                 </div>
-                <h1 className="text-4xl font-extrabold tracking-tight text-slate-800 mb-4">
+                <h1 className="text-5xl md:text-6xl font-display font-extrabold tracking-tighter text-slate-900 mb-4">
                   {t.heroTitle}
                 </h1>
-                <p className="text-lg text-slate-500 mb-8">
+                <p className="text-lg md:text-xl text-slate-500 mb-8 font-medium">
                   {t.heroDesc}
                 </p>
               </div>

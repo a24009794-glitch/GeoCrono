@@ -39,7 +39,7 @@ export const WorldMap: React.FC<WorldMapProps> = ({ foundCountries, region, mapS
   const mapConfig = REGION_CONFIGS[region] || REGION_CONFIGS["Mundo"];
 
   const isDark = mapStyle === 'dark';
-  const bgColor = isDark ? "bg-slate-800 border-slate-700" : "bg-slate-100 border-slate-200";
+  const bgColor = isDark ? "bg-slate-900 border-slate-700" : "bg-slate-50 border-transparent";
   const defaultFill = isDark ? "#334155" : "#e2e8f0";
   const hoverFill = isDark ? "#475569" : "#cbd5e1";
   const strokeColor = isDark ? "#1e293b" : "#ffffff";
@@ -47,7 +47,7 @@ export const WorldMap: React.FC<WorldMapProps> = ({ foundCountries, region, mapS
   const foundHoverFill = isDark ? "#10b981" : "#059669";
 
   return (
-    <div className={`w-full h-full ${bgColor} rounded-xl overflow-hidden border-2 flex items-center justify-center relative transition-colors`}>
+    <div className={`w-full h-full ${bgColor} rounded-xl overflow-hidden flex items-center justify-center relative transition-colors`}>
       <ComposableMap 
         projection="geoMercator" 
         projectionConfig={{ scale: 120 }}
